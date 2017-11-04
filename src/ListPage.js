@@ -1,0 +1,56 @@
+import React, { Component } from 'react'
+import BookShelf from './BookShelf'
+import { Link } from 'react-router-dom'
+import { getAll } from './BooksAPI'
+
+class ListPage extends Component {
+
+  state = {
+    books: [],
+    currentlyReading: [],
+    wantToRead: [],
+    read: []
+  }
+
+  componentDidMount() {
+    getAll().then((books) => {
+      this.updateShelves(books)
+    })
+  }
+
+  updateShelves(books) {
+    this.setState({
+      books: books,
+      currentlyReading: books.filter((b) => { return b.shelf === 'currentlyReading'}),
+      wantToRead: books.filter((b) => { return b.shelf === 'wantToRead'}),
+      read: books.filter((b) => { return b.shelf === 'read'})
+    })
+  }
+
+  refresh() {
+    this.updateShelves(this.state.books)
+  }
+
+  render() {
+    const { currentlyReading, wantToRead, read } = this.state
+    return (
+      <div className="list-books">
+        <div className="list-books-title">
+          <h1>MyReads</h1>
+        </div>
+        <div className="list-books-content">
+          <div>
+            <BookShelf books={currentlyReading} title="Currently Reading" page={this}/>
+            <BookShelf books={wantToRead} title="Want to Read" page={this}/>
+            <BookShelf books={read} title="Read" page={this}/>
+          </div>
+        </div>
+        <div className="open-search">
+          <Link to="/search">Add a book</Link>
+        </div>
+      </div>
+    )
+  }
+}
+
+export default ListPage
