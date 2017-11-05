@@ -7,9 +7,6 @@ class ListPage extends Component {
 
   state = {
     books: [],
-    currentlyReading: [],
-    wantToRead: [],
-    read: []
   }
 
   componentDidMount() {
@@ -20,10 +17,7 @@ class ListPage extends Component {
 
   updateShelves(books) {
     this.setState({
-      books: books,
-      currentlyReading: books.filter((b) => { return b.shelf === 'currentlyReading'}),
-      wantToRead: books.filter((b) => { return b.shelf === 'wantToRead'}),
-      read: books.filter((b) => { return b.shelf === 'read'})
+      books: books
     })
   }
 
@@ -32,7 +26,7 @@ class ListPage extends Component {
   }
 
   render() {
-    const { currentlyReading, wantToRead, read } = this.state
+    const { books} = this.state
     return (
       <div className="list-books">
         <div className="list-books-title">
@@ -40,9 +34,9 @@ class ListPage extends Component {
         </div>
         <div className="list-books-content">
           <div>
-            <BookShelf books={currentlyReading} title="Currently Reading" page={this}/>
-            <BookShelf books={wantToRead} title="Want to Read" page={this}/>
-            <BookShelf books={read} title="Read" page={this}/>
+            <BookShelf books={books.filter((b) => { return b.shelf === 'currentlyReading'})} title="Currently Reading" page={this}/>
+            <BookShelf books={books.filter((b) => { return b.shelf === 'wantToRead'})} title="Want to Read" page={this}/>
+            <BookShelf books={books.filter((b) => { return b.shelf === 'read'})} title="Read" page={this}/>
           </div>
         </div>
         <div className="open-search">

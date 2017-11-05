@@ -1,27 +1,48 @@
 import React, { Component } from 'react'
-import { search } from './BooksAPI'
+import { search, getAll } from './BooksAPI'
 import BookShelf from './BookShelf'
 
 class SearchResults extends Component {
 
   state = {
-    results: [],
-    filtered: []
+    bookIdsInLibrary: [],
+    results: []
+  }
+
+  componentDidMount() {
+    getAll().then((books) => {
+      this.setState({
+        bookIdsInLibrary: books.map((b) => { return b.id })
+      })
+    })
   }
 
   componentWillReceiveProps(nextProps) {
     const { query } = nextProps
     if (query.length > 0) {
       search(query).then((r) => {
-        this.filterResults(r)
+        if (r !== null && r.length > 0) {
+          this.filterResults(r)
+        } else {
+          this.emptyResults()
+        }
       })
-    } 
+    } else {
+      this.emptyResults()
+    }
+  }
+
+  emptyResults() {
+    if (this.state.results.length > 0) {
+      this.setState({
+        results: []
+      })
+    }
   }
 
   filterResults(results) {
     this.setState({
-      results: results,
-      filtered: results.filter((b) => { return !b.shelf || b.shelf === 'none' })
+      results: results.filter((b) => { return (!b.shelf || b.shelf === 'none') && !this.state.bookIdsInLibrary.includes(b.id)})
     })
   }
 
@@ -31,7 +52,7 @@ class SearchResults extends Component {
 
   render() {
     return (
-      <BookShelf books={this.state.filtered} title="Search Results" page={this} />
+      <BookShelf books={this.state.results} title="Search Results" page={this} />
     )
   }
 }
